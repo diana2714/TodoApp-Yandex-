@@ -1,4 +1,4 @@
-package com.example.to_doapp.data.model
+package com.example.todoappsecond.data.model
 
 import java.util.Date
 

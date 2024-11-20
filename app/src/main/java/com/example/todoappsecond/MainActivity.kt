@@ -1,20 +1,20 @@
-package com.example.to_doapp
+
+package com.example.todoappsecond
 
 import NewTaskScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.to_doapp.data.repository.TodoItemsRepository
-import com.example.to_doapp.ui.TodoListScreen
-
+import com.example.todoappsecond.data.repository.TodoItemsRepository
+import com.example.todoappsecond.network.NetworkModule
+import com.example.todoappsecond.ui.TodoListScreen
+import com.example.todoappsecond.ui.TodoViewModel
+import com.example.todoappsecond.ui.TodoViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,29 +29,29 @@ class MainActivity : ComponentActivity() {
 fun MyApp() {
     val navController = rememberNavController()
 
-    // Инициализируем репозиторий и получаем задачи
-    val todoRepository = TodoItemsRepository()
-    val todoItems = remember { mutableStateOf(todoRepository.generateSampleTodoItems()) } // Получаем задачи из репозитория
+    // Создаем экземпляры API-сервиса и репозитория
+    val apiService = NetworkModule.provideTodoApiService()
+    val repository = TodoItemsRepository(apiService) // Передаем apiService в конструктор репозитория
+
+    // Инициализируем TodoViewModel с использованием фабрики
+    val todoViewModel: TodoViewModel = viewModel(factory = TodoViewModelFactory(repository))
 
     NavHost(navController = navController, startDestination = "todo_list") {
         composable(route = "todo_list") {
             TodoListScreen(
                 navController = navController,
-                todoItems = todoItems.value,
-                onTaskStatusChange = { todoItem, isChecked ->
-                    todoItems.value = todoItems.value.map { it ->
-                        if (it.id == todoItem.id) it.copy(isCompleted = isChecked) else it
-                    }
-                },
                 onAddTaskClick = {
                     navController.navigate("new_task")
-                }
+                },
+                viewModel = todoViewModel
             )
         }
         composable(route = "new_task") {
-            NewTaskScreen(navController = navController, oneNewTodoItem = { newTask ->
-                todoItems.value = todoItems.value + newTask
-            }
+            NewTaskScreen(
+                navController = navController,
+                oneNewTodoItem = { newTask ->
+                    todoViewModel.addTodoItem(newTask)
+                }
             )
         }
     }

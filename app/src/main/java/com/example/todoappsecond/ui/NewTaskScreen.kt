@@ -19,12 +19,12 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.to_doapp.R
+import com.example.todoappsecond.R
 import java.text.SimpleDateFormat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import com.example.to_doapp.data.model.Importance
-import com.example.to_doapp.data.model.TodoItem
+import com.example.todoappsecond.data.model.Importance
+import com.example.todoappsecond.data.model.TodoItem
 import java.util.*
 
 @Composable
