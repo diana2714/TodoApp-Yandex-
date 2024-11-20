@@ -5,13 +5,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.todoappsecond"
-    compileSdk = 34
+    namespace = "com.example.to_doapp"
+    compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.todoappsecond"
-        minSdk = 24
-        targetSdk = 34
+        applicationId = "com.example.to_doapp"
+        minSdk = 25
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -40,7 +40,14 @@ android {
 }
 
 dependencies {
-
+    implementation(platform("androidx.compose:compose-bom:2024.10.00")) // Укажите актуальную версию BOM
+    implementation("androidx.compose.material3:material3:1.1.0")
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.1")
+    implementation("androidx.compose.material:material-icons-extended")
+    implementation ("androidx.navigation:navigation-compose:2.5.3")
+    implementation( "androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-tooling-preview")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

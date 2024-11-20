@@ -1,3 +1,13 @@
 <resources>
-    <string name="app_name">TodoAppSecond</string>
+    <string name="app_name">To-doApp</string>
+    <string name="saveTask">СОХРАНИТЬ</string>
+    <string name="NeedSmthTodo">Что надо сделать...</string>
+    <string name="Importance">Важность</string>
+    <string name="No">Нет</string>
+    <string name="Low">Низкий</string>
+    <string name="High">!! Высокий</string>
+    <string name="DoUntill">Сделать до</string>
+    <string name="Delete">Удалить</string>
+    <string name="Done">Выполнено — %1$s</string>
+    <string name="MyDoings">Мои дела</string>
 </resources>
