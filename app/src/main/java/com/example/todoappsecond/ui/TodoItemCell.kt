@@ -2,7 +2,6 @@ package com.example.to_doapp.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import com.example.to_doapp.data.model.Importance
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,7 +20,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import com.example.to_doapp.data.model.TodoItem
+import com.example.todoappsecond.data.model.Importance
+import com.example.todoappsecond.data.model.TodoItem
 
 @Composable
 fun TodoItemCell(todoItem: TodoItem, onCheckedChange: (Boolean) -> Unit) {
