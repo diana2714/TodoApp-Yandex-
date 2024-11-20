@@ -1,6 +1,6 @@
 package com.example.todoappsecond.network
 
-import com.example.todoappsecond.data.model.TodoItem
+import com.example.todoappsecond.domain.TodoItem
 
 data class TodoListResponse(
     val status: String,

@@ -1,6 +1,7 @@
+package com.example.todoappsecond.ui.newTaskScreen
+
 import android.app.DatePickerDialog
 import android.widget.DatePicker
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,35 +15,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.todoappsecond.R
 import java.text.SimpleDateFormat
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
-import com.example.todoappsecond.data.model.Importance
-import com.example.todoappsecond.data.model.TodoItem
+import com.example.todoappsecond.domain.TodoItem
 import java.util.*
 
 @Composable
-fun NewTaskScreen(navController: NavController, oneNewTodoItem: (TodoItem) -> Unit) {
-
-    val taskText = remember { mutableStateOf("") }
-    val importance = remember { mutableStateOf("Нет") }
-    val isDeadlineSet = remember { mutableStateOf(false) }
-    var selectedDate by remember { mutableStateOf<Date?>(null) }
-    var expanded by remember { mutableStateOf(false) }
+fun NewTaskScreen(
+    navController: NavController,
+    oneNewTodoItem: (TodoItem) -> Unit,
+    model: NewTaskScreenModel = remember { NewTaskScreenModel() }
+) {
     val context = LocalContext.current
     val calendar = Calendar.getInstance()
-    val taskImportance = when (importance.value) {
-        "Нет" -> Importance.NORMAL
-        "Низкий" -> Importance.LOW
-        "!! Высокий" -> Importance.HIGH
-        else -> Importance.NORMAL
-    }
 
     Column(
         modifier = Modifier
@@ -56,26 +45,34 @@ fun NewTaskScreen(navController: NavController, oneNewTodoItem: (TodoItem) -> Un
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { navController.popBackStack() }) { // Закрыть экран
+            IconButton(onClick = { navController.popBackStack() }) {
                 Icon(
                     painter = painterResource(id = R.drawable.close),
                     contentDescription = "Закрыть",
                     modifier = Modifier.size(14.dp)
                 )
             }
-            TextButton(onClick = {
-                val newTask = TodoItem(
-                    id = UUID.randomUUID().toString(),
-                    text = taskText.value,
-                    isCompleted = false,
-                    importance = taskImportance,
-                    createdAt = Date(),
-                    deadline = selectedDate
+            TextButton(
+                onClick = {
+                    val newTask = TodoItem(
+                        id = UUID.randomUUID().toString(),
+                        text = model.taskText.value,
+                        isCompleted = false,
+                        importance = model.taskImportance,
+                        createdAt = Date(),
+                        deadline = model.selectedDate.value
+                    )
+                    oneNewTodoItem(newTask)
+                    model.reset() // Сбрасываем модель
+                    navController.popBackStack()
+                },
+                enabled = model.taskText.value.isNotBlank()
+            ) {
+                Text(
+                    text = stringResource(R.string.saveTask),
+                    color = if (model.taskText.value.isNotBlank()) Color(0xFF007AFF) else Color.Gray,
+                    fontSize = 14.sp
                 )
-                oneNewTodoItem(newTask)
-                navController.popBackStack() // Вернуться на предыдущий экран
-            }) {
-                Text(text = stringResource(R.string.saveTask), color = Color(0xFF007AFF), fontSize = 14.sp)
             }
         }
 
@@ -83,29 +80,21 @@ fun NewTaskScreen(navController: NavController, oneNewTodoItem: (TodoItem) -> Un
 
         // Поле для ввода текста
         OutlinedTextField(
-            value = taskText.value,
-            onValueChange = { newText ->
-                taskText.value = newText
-            },
+            value = model.taskText.value,
+            onValueChange = { model.taskText.value = it },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(104.dp)
-                .shadow(
-                    elevation = 4.dp, // Высота тени
-                    shape = RoundedCornerShape(8.dp) // Скругленные углы
-                )
-                .background(Color.White, shape = RoundedCornerShape(8.dp)),
+                .shadow(4.dp, RoundedCornerShape(8.dp))
+                .background(Color.White, RoundedCornerShape(8.dp)),
             placeholder = {
                 Text(
                     text = stringResource(R.string.NeedSmthTodo),
-                    color = Color.Gray, // Цвет текста для placeholder
-                    fontSize = 16.sp // Размер шрифта для placeholder
+                    color = Color.Gray,
+                    fontSize = 16.sp
                 )
             },
-
-            )
-
-
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -114,39 +103,39 @@ fun NewTaskScreen(navController: NavController, oneNewTodoItem: (TodoItem) -> Un
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { expanded = true }
+                .clickable { model.expanded.value = true }
                 .padding(top = 4.dp)
         ) {
             Text(
-                text = importance.value,
+                text = model.importance.value,
                 fontSize = 16.sp,
-                color = if (importance.value == "!! Высокий") Color.Red else Color.Gray
+                color = if (model.importance.value == "!! Высокий") Color.Red else Color.Gray
             )
 
             DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false },
+                expanded = model.expanded.value,
+                onDismissRequest = { model.expanded.value = false },
                 offset = DpOffset(x = 0.dp, y = 8.dp)
             ) {
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.No)) },
                     onClick = {
-                        importance.value = "Нет"
-                        expanded = false
+                        model.importance.value = "Нет"
+                        model.expanded.value = false
                     }
                 )
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.Low)) },
                     onClick = {
-                        importance.value = "Низкий"
-                        expanded = false
+                        model.importance.value = "Низкий"
+                        model.expanded.value = false
                     }
                 )
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.High), color = Color.Red) },
                     onClick = {
-                        importance.value = "!! Высокий"
-                        expanded = false
+                        model.importance.value = "!! Высокий"
+                        model.expanded.value = false
                     }
                 )
             }
@@ -160,11 +149,9 @@ fun NewTaskScreen(navController: NavController, oneNewTodoItem: (TodoItem) -> Un
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
-                modifier = Modifier.padding(bottom = 50.dp) // Добавляем нижний отступ
-            ) {
+            Column {
                 Text(text = stringResource(R.string.DoUntill), fontSize = 16.sp)
-                selectedDate?.let {
+                model.selectedDate.value?.let {
                     Text(
                         text = SimpleDateFormat("d MMMM yyyy", Locale.getDefault()).format(it),
                         color = Color(0xFF007AFF),
@@ -173,15 +160,15 @@ fun NewTaskScreen(navController: NavController, oneNewTodoItem: (TodoItem) -> Un
                 }
             }
             Switch(
-                checked = isDeadlineSet.value,
+                checked = model.isDeadlineSet.value,
                 onCheckedChange = {
-                    isDeadlineSet.value = it
+                    model.isDeadlineSet.value = it
                     if (it) {
                         val datePickerDialog = DatePickerDialog(
                             context,
                             { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
                                 calendar.set(year, month, dayOfMonth)
-                                selectedDate = calendar.time
+                                model.selectedDate.value = calendar.time
                             },
                             calendar.get(Calendar.YEAR),
                             calendar.get(Calendar.MONTH),
@@ -189,7 +176,7 @@ fun NewTaskScreen(navController: NavController, oneNewTodoItem: (TodoItem) -> Un
                         )
                         datePickerDialog.show()
                     } else {
-                        selectedDate = null // сбросить выбранную дату, если переключатель выключен
+                        model.selectedDate.value = null
                     }
                 },
                 colors = SwitchDefaults.colors(
@@ -197,8 +184,7 @@ fun NewTaskScreen(navController: NavController, oneNewTodoItem: (TodoItem) -> Un
                     uncheckedThumbColor = Color.Gray,
                     checkedTrackColor = Color(0xFF007AFF),
                     uncheckedTrackColor = Color(0x33007AFF)
-                ),
-                modifier = Modifier.padding(bottom = 50.dp)
+                )
             )
         }
 
@@ -208,11 +194,11 @@ fun NewTaskScreen(navController: NavController, oneNewTodoItem: (TodoItem) -> Un
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { /* Action to delete the task */ }
+                .clickable { model.reset() }
                 .padding(vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val deleteColor = if (taskText.value.isEmpty()) Color.Gray else Color.Red
+            val deleteColor = if (model.taskText.value.isEmpty()) Color.Gray else Color.Red
             Icon(
                 painter = painterResource(id = R.drawable.delete),
                 contentDescription = "Удалить",
@@ -228,4 +214,3 @@ fun NewTaskScreen(navController: NavController, oneNewTodoItem: (TodoItem) -> Un
         }
     }
 }
-

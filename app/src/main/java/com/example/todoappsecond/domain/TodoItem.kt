@@ -1,4 +1,4 @@
-package com.example.todoappsecond.data.model
+package com.example.todoappsecond.domain
 
 import java.util.Date
 

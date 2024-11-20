@@ -1,31 +1,34 @@
-package com.example.todoappsecond.network
+package com.example.todoappsecond.data.api
 
-import com.example.todoappsecond.data.model.TodoItemRequest
-import com.example.todoappsecond.data.model.TodoItemResponse
+
+import com.example.todoappsecond.data.dto.TodoItemRequestDto
+import com.example.todoappsecond.data.dto.TodoItemResponseDto
 import retrofit2.Response
 import retrofit2.http.*
 
 interface TodoApiService {
 
     @GET("list")
-    suspend fun getTodoList(@Header("X-Last-Known-Revision") revision: Int): Response<TodoItemResponse>
+    suspend fun getTodoList(
+        @Header("X-Last-Known-Revision") revision: Int
+    ): Response<TodoItemResponseDto>
 
     @POST("list")
     suspend fun addTodoItem(
         @Header("X-Last-Known-Revision") revision: Int,
-        @Body todoItem: TodoItemRequest
-    ): Response<TodoItemResponse>
+        @Body todoItem: TodoItemRequestDto
+    ): Response<TodoItemResponseDto>
 
     @PUT("list/{id}")
     suspend fun updateTodoItem(
         @Header("X-Last-Known-Revision") revision: Int,
         @Path("id") id: String,
-        @Body todoItem: TodoItemRequest
-    ): Response<TodoItemResponse>
+        @Body todoItem: TodoItemRequestDto
+    ): Response<TodoItemResponseDto>
 
     @DELETE("list/{id}")
     suspend fun deleteTodoItem(
         @Header("X-Last-Known-Revision") revision: Int,
         @Path("id") id: String
-    ): Response<TodoItemResponse>
+    ): Response<TodoItemResponseDto>
 }
